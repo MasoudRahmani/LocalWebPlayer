@@ -17,7 +17,7 @@
 			<div class="input-group px-2">
 				<span class="lead">Players:</span>
 				<div class="card-body text-center" >
-				  <button id="sply" type="button" class="btn btn-primary mb-2 active" onclick="ChangePlayer(this)"> SubPlayer (.SRT,.ASS)</button>
+				  <button id="sply" type="button" class="btn btn-primary mb-2" onclick="ChangePlayer(this)"> SubPlayer (.SRT,.ASS)</button>
 				  <button id="npl" type="button" class="btn btn-primary mb-2" onclick="ChangePlayer(this)"> Normal (.Webttv)</button>
 				  <button id="ppl" type="button" class="btn btn-primary mb-2" onclick="ChangePlayer(this)"> Plyr Player (Webttv)*</button>
 				</div>
@@ -50,13 +50,17 @@
 	<div id="SubPlayer" > </div>
 	</div>
 	<!-- No External lib HTML  Only WebTTV sub-->
-	<div class="d-flex justify-content-center mx-auto" style="width: auto;height: auto;visibility: hidden" id="npParent">
+	<div class="d-flex justify-content-center mx-auto" style="width: auto;height: auto;visibility: hidden" 
+		 id="npParent">
 		<video id="normalplayer" controls="controls"/>
 	</div>
 	
 	
 
 	<script>
+        var _activePlayer = "ppl";
+		toggleActive(_activePlayer);
+
 		function loadsubplayer(){
 			//https://cdn.jsdelivr.net/gh/MasoudRahmani/SubPlayerJS@latest/SubPlayerJS.js
 			let js = document.createElement('script');
@@ -114,7 +118,7 @@
 						100
 				);
 		}
-		 <!-- For Fun - No External Liberary -->
+		/*For Fun - No External Liberary */
 		function masoud() {
 			toggleVisibility();
 			let nplayer = document.getElementById("normalplayer");
@@ -134,7 +138,7 @@
 			// HTML5 needs to load
 			nplayer.load();
 		}
-			<!-- Plyr library -->
+        /*Plyr library */
 		function startplyr(){
 			if(typeof(player) !== 'undefined') player.destroy();//if url changed
 			
@@ -183,7 +187,6 @@
 				);
 		}
 		
-		var _activePlayer = "spParent";
 		function ChangePlayer(e){
 			let playbutt = document.getElementById("playButton");
 			toggleActive(e.id);
@@ -194,17 +197,17 @@
 				document.getElementById("SubPlayer").textContent = '';
 				
 				_activePlayer = "npParent";
-				playButton.onclick = masoud;
+				playbutt.onclick = masoud;
 			break;
 			case "sply":
 				if(typeof(player) !== 'undefined') player.destroy();				
 				_activePlayer = "spParent";
-				playButton.onclick = subpl;
+				playbutt.onclick = subpl;
 			break;
 			case "ppl":
 				document.getElementById("SubPlayer").textContent = '';
 				_activePlayer = "ppParent";
-				playButton.onclick = startplyr;
+				playbutt.onclick = startplyr;
 			break;
 			default:
 			return;
@@ -234,7 +237,7 @@
   <!-- Copyright -->
   <div class="text-center p-3">
     © 2021 BY:
-    <a class="text-dark" href="https://mdbootstrap.com/">mrem71@gmail.com</a>
+    <a class="text-dark">mrem71@gmail.com</a>
   </div>
   <!-- Copyright -->
 </footer>
