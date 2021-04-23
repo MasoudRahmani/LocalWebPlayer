@@ -1,26 +1,26 @@
 //////// !window.jQuery && document.write(unescape('%3Cscript src="https://code.jquery.com/jquery-3.6.0.min.js"%3E%3C%2Fscript%3E%3Cscript src="jquery.ajax-cross-origin.min.js"%3E%3C%2Fscript%3E'));
-if(!window.jQuery)
-{
-	let js = document.createElement('script');
-	js.type = "text/javascript";
-	js.src = "https://code.jquery.com/jquery-3.6.0.min.js";
-	let js2 = document.createElement('script');
-	js2.type = "text/javascript";
-	js2.src = "jquery.ajax-cross-origin.min.js";
-	let h = document.getElementsByTagName('head')[0];
-	 h.insertBefore(js,h.firstChild);
+//if(!window.jQuery)
+//{
+//	let js = document.createElement('script');
+//	js.type = "text/javascript";
+//	js.src = "";
+//	let js2 = document.createElement('script');
+//	js2.type = "text/javascript";
+//	js2.src = "jquery.ajax-cross-origin.min.js";
+//	let h = document.getElementsByTagName('head')[0];
+//	 h.insertBefore(js,h.firstChild);
 	 
-	 var interv = setInterval(
-								()=> { if(window.jQuery) {
-										console.log(1,"<- time tried to load jq." );
-										h.appendChild(js2);
-										clearInterval(interv);
-										}  
-									},
-								100
-						);
+//	 var interv = setInterval(
+//								()=> { if(window.jQuery) {
+//										console.log(1,"<- time tried to load jq." );
+//										h.appendChild(js2);
+//										clearInterval(interv);
+//										}  
+//									},
+//								100
+//						);
 
-}
+//}
 
 
 //loads video
