@@ -6,6 +6,7 @@
     <meta name="robots" content="noindex, nofollow">
     <link rel="shortcut icon" href="favicon.ico">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
 
     <!--<script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous" type="text/javascript"></script>-->
     <script src="jquery-3.6.0.min.js" type="text/javascript"></script>
@@ -18,13 +19,18 @@
     <div class="container-fluid">
 
         <div class="card bg-light mb-2">
-            <div class="card-header ">Options: <span class="badge bg-warning text-dark" title="changing player causes your video to reload!">Warning</span> </div>
+            <div class="card-header ">
+                Options:
+                <span class="badge bg-warning text-dark" id="warn"
+                      data-bs-toggle="tooltip" data-bs-placement="right"
+                      title="changing player causes your video to reload!">Warning</span>
+            </div>
             <div class="input-group px-2">
                 <span class="lead">Players:</span>
                 <div class="card-body text-center">
-                    <button id="sply" type="button" class="btn btn-primary mb-2" onclick="ChangePlayer(this)"> SubPlayer (.SRT,.ASS)</button>
-                    <button id="npl" type="button" class="btn btn-primary mb-2" onclick="ChangePlayer(this)"> Normal (.Webttv)</button>
-                    <button id="ppl" type="button" class="btn btn-primary mb-2" onclick="ChangePlayer(this)"> Plyr Player (Webttv)*</button>
+                    <button id="ppl" type="button" class="btn btn-primary mb-2" onclick="ChangePlayer(this.id)"> Plyr Player♥</button>
+                    <button id="npl" type="button" class="btn btn-primary mb-2" onclick="ChangePlayer(this.id)"> Normal </button>
+                    <button id="sply" type="button" class="btn btn-primary mb-2" onclick="ChangePlayer(this.id)"> <strike>SubPlayer (.ASS)</strike></button>
                 </div>
             </div>
             <div class="input-group mb-2 px-2">
@@ -35,8 +41,8 @@
 
             <div class="input-group mb-2 px-2">
                 <span class="input-group-text" id="basic-addon3">Subtitle:</span>
-                <input id="sub" type="text" class="form-control" aria-describedby="basic-addon3"
-                       value="SRT - WebVTT sub file please. [اختیاری]" />
+                <input id="sub" type="text" class="form-control border border-3 rounded-pill" aria-describedby="basic-addon3"
+                       onchange="SubControl()" onpaste="this.onchange()" oninput="this.onchange()" />
                 <button class="btn btn-outline-primary" type="button" id="playButton">
                     Play
                 </button>
@@ -61,17 +67,24 @@
     </div>
 
 
+    <!--<script src="subconvertor.js" type="text/javascript"></script>-->
+    <script src="srt-webvtt.js"></script>
 
     <script>
         window.onload = Loaded;
         //config
         var _visiblePlayer = "ppParent";
         var _activePlayer = "ppl";
+        var _subtitle = "[Optional] SRT | WebVTT | SubPlayer: +ASS";
 
         //functions
         function Loaded() {
-            toggleActive(_activePlayer);
+            new bootstrap.Tooltip($("#warn")[0])
+            $("#sub")[0].value = _subtitle;
+            toggleActive();
+
             ChangePlayer(_activePlayer);
+            subValidation();
         }
 
         function loadsubplayer() {
@@ -110,7 +123,7 @@
         /*Old Player that support srt and ass - not good - experimental*/
         function subpl() {
             document.getElementById("SubPlayer").textContent = ''; //changed Url
-            
+
             if (typeof (SubPlayerJS) == 'undefined') loadsubplayer();
 
             let interv = setInterval(
@@ -119,11 +132,9 @@
                         console.log(1, "<- time tried to load sub.");
 
                         var vidadr = document.getElementById("sourceOfVideo").value;
-                        var subadr = document.getElementById("sub").value;
-                        if (subadr == "SRT - WebVTT sub file please. [اختیاری]") subadr = "";
 
                         var newPlayer = new SubPlayerJS('#SubPlayer', vidadr);
-                        newPlayer.setSubtitle(subadr);
+                        newPlayer.setSubtitle(_subtitle);
                         window.newPlayer = newPlayer;
 
                         clearInterval(interv);
@@ -136,19 +147,18 @@
         function masoud() {
             let nplayer = document.getElementById("normalplayer");
             nplayer.textContent = '';
-            
+
             let vidadr = document.getElementById("sourceOfVideo").value;
-            let subadr = document.getElementById("sub").value;
-            if (subadr == "SRT - WebVTT sub file please. [اختیاری]") subadr = "";
 
             let source = document.createElement("source");
             let track = document.createElement("track"); //Only Wbttv
             source.src = vidadr;
-            Object.assign(track, { src: subadr, kind: "subtitle", srclang: "en-US", label: "English" });
+            Object.assign(track, { src: _subtitle, kind: "subtitle", srclang: "en-US", label: "English" });
 
             nplayer.appendChild(source);
             nplayer.appendChild(track);
             // HTML5 needs to load
+            nplayer.textTracks[0].mode = 'showing';
             nplayer.load();
         }
         /*Plyr library */
@@ -169,9 +179,6 @@
                         });
 
                         const vidadr = document.getElementById("sourceOfVideo").value;
-                        let subadr = document.getElementById("sub").value;
-
-                        if (subadr == "SRT - WebVTT sub file please. [اختیاری]") subadr = "";
 
                         player.source = {
                             type: 'video',
@@ -185,7 +192,7 @@
                                     kind: 'captions',
                                     label: 'English',
                                     srclang: 'en',
-                                    src: subadr, //Only WebVTT
+                                    src: _subtitle, //Only WebVTT
                                     default: true,
                                 }
                             ]
@@ -200,10 +207,14 @@
         }
 
         function ChangePlayer(e) {
-            let playbutt = $("#playButton")[0];
+            if (typeof (e) == 'undefined') return;
 
-            switch (e.id) {
+            let playbutt = $("#playButton")[0];
+            _activePlayer = e;
+
+            switch (e) {
                 case "npl":
+
                     if (typeof (player) !== 'undefined') player.destroy();
                     document.getElementById("SubPlayer").textContent = '';
 
@@ -233,7 +244,8 @@
                     return;
             }
             toggleVisibility();
-            toggleActive(e.id);
+            toggleActive();
+            SubControl();
         }
 
         function toggleVisibility() {
@@ -245,13 +257,71 @@
             //show
             document.getElementById(_visiblePlayer).style.visibility = "visible";
         }
-        function toggleActive(activatedButton) {
+        function toggleActive() {
             //	first Deactive
             document.getElementById("sply").classList.remove('active');
             document.getElementById("npl").classList.remove('active');
             document.getElementById("ppl").classList.remove('active');
             // Activate
-            document.getElementById(activatedButton).classList.add('active');
+            document.getElementById(_activePlayer).classList.add('active');
+        }
+
+        function SubControl() {
+            if (_subtitle.search('blob:') == 0) {
+                URL.revokeObjectURL(_subtitle);
+            }
+            _subtitle = $("#sub")[0].value;
+            const ext = _subtitle.substring(_subtitle.length - 4, _subtitle.length);
+
+            switch (ext) {
+                case ".srt":
+                    //Convert to SRT
+                    $.get(_subtitle).then((x) => {
+                        const wbttc = new WebVTTConverter(new Blob([x], { type: 'text/plain' }));
+                        wbttc.getURL()
+                            .then(function (url) {
+                                _subtitle = url;
+                                subValidation(true);
+                            })
+                            .catch(function (err) {
+                                console.error(err);
+                            })
+                    });
+
+                    //let vtt;
+                    //  $.get(_subtitle).then((x) => {
+                    //vtt = srt2webvtt(x);
+                    //let subblob = new Blob([vtt], { type: 'text/vtt' });
+                    //_subtitle = (URL || webkitURL).createObjectURL(subblob);
+
+                    //subValidation(true);
+                    //   });
+
+                    break;
+                case ".ass":
+                    if (_activePlayer == "sply") {
+                        subValidation(true);
+                    } else subValidation(false);
+                    break;
+                case ".vtt":
+
+                    subValidation(true);
+                    break;
+                default:
+                    subValidation(false);
+            }
+        }
+        function subValidation(ok) {
+            //Green light
+            if (ok) {
+                $("#sub").removeClass("border-danger");
+                $("#sub").addClass("border-success");
+            }
+            else {
+                //red light
+                $("#sub").removeClass("border-success");
+                $("#sub").addClass("border-danger");
+            }
         }
     </script>
 
