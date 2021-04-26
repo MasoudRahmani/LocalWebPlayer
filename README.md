@@ -1,8 +1,10 @@
 # LocalWebPlayer
+
 Play media from direct link with subtitle
 
 # dependancy
-* (subsrt.js) https://github.com/MasoudRahmani/subsrtbrowsified
+
+* [subsrt.js]
 * bootstrap 5
 * Jquery
 * Plyr
@@ -10,6 +12,10 @@ Play media from direct link with subtitle
 
 # To do
 
-* Subplayer should not use blob -> or handle blob file in subplayer
-* more Jquery?
-* complex ass and ssa problem -> these file conversion is incomplete (subsrt problem? or boundled?)
+* [ ] Subplayer should not use blob -> or handle blob file in subplayer
+* [ ] more Jquery?
+* [ ] complex ass and ssa problem -> these file conversion is incomplete (subsrt problem? or boundled?)
+* [ ] subtitle from remote origin -> 'file:' URLs are treated as unique security origins.
+
+
+[subsrt.js]: https://github.com/MasoudRahmani/subsrtbrowsified
