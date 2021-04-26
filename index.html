@@ -1,12 +1,13 @@
 <!DOCTYPE HTML>
 <html>
+
 <head>
     <title>Offline Web Player ** By Masoud Rahmani **</title>
     <meta name="description" content="Offline Web Player ** By Masoud Rahmani **" />
     <meta name="robots" content="noindex, nofollow">
     <link rel="shortcut icon" href="favicon.ico">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="bootstrap.min.css" />
+    <script src="bootstrap.bundle.min.js"></script>
 
     <!--<script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous" type="text/javascript"></script>-->
     <script src="jquery-3.6.0.min.js" type="text/javascript"></script>
@@ -21,35 +22,37 @@
         <div class="card bg-light mb-2">
             <div class="card-header ">
                 Options:
-                <span class="badge bg-warning text-dark" id="warn"
-                      data-bs-toggle="tooltip" data-bs-placement="right"
-                      title="changing player causes your video to reload!">Warning</span>
+                <span class="badge bg-warning text-dark" id="warn" data-bs-toggle="tooltip" data-bs-placement="right"
+                    title="changing player causes your video to reload!">Warning</span>
             </div>
             <div class="input-group px-2">
                 <span class="lead">Players:</span>
                 <div class="card-body text-center">
-                    <button id="ppl" type="button" class="btn btn-primary mb-2" onclick="ChangePlayer(this.id)"> Plyr Player♥</button>
-                    <button id="npl" type="button" class="btn btn-primary mb-2" onclick="ChangePlayer(this.id)"> Normal </button>
-                    <button id="sply" type="button" class="btn btn-primary mb-2" onclick="ChangePlayer(this.id)"> <strike>SubPlayer (.ASS)</strike></button>
+                    <button id="ppl" type="button" class="btn btn-primary mb-2" onclick="ChangePlayer(this.id)"> Plyr
+                        Player♥</button>
+                    <button id="npl" type="button" class="btn btn-primary mb-2" onclick="ChangePlayer(this.id)"> Normal
+                    </button>
+                    <button id="sply" type="button" class="btn btn-primary mb-2" onclick="ChangePlayer(this.id)">
+                        <strike>SubPlayer (.ASS)</strike></button>
                 </div>
             </div>
             <div class="input-group mb-2 px-2">
                 <span class="input-group-text" id="basic-addon3">URL:</span>
                 <input id="sourceOfVideo" type="text" class="form-control" aria-describedby="basic-addon3"
-                       value="http://techslides.com/demos/sample-videos/small.mp4" />
+                    value="http://techslides.com/demos/sample-videos/small.mp4" />
             </div>
 
             <div class="input-group mb-2 px-2">
                 <span class="input-group-text" id="basic-addon3">Subtitle:</span>
-                <input id="sub" type="text" class="form-control border border-3 rounded-pill" aria-describedby="basic-addon3"
-                       onchange="SubControl()" onpaste="this.onchange()" oninput="this.onchange()" />
+                <input id="sub" type="text" class="form-control border border-3 rounded-pill"
+                    aria-describedby="basic-addon3" onchange="SubControl()" onpaste="this.onchange()"
+                    oninput="this.onchange()" />
                 <button class="btn btn-outline-primary" type="button" id="playButton">
                     Play
                 </button>
             </div>
         </div>
     </div>
-
 
     <!-- PLYR only webttv -->
     <div class="container-fluid ratio" id="ppParent">
@@ -62,27 +65,26 @@
     </div>
     <!-- No External lib HTML  Only WebTTV sub-->
     <div class="d-flex justify-content-center mx-auto" style="width: auto;height: auto;visibility: hidden"
-         id="npParent">
+        id="npParent">
         <video id="normalplayer" controls="controls" />
     </div>
 
-
-    <!--<script src="subconvertor.js" type="text/javascript"></script>-->
-    <script src="srt-webvtt.js"></script>
+    <!-- <script src="srt-webvtt.js"></script> -->
+    <script src="../subsrtbrowsified/dist/subsrt.js"></script>
 
     <script>
         window.onload = Loaded;
         //config
         var _visiblePlayer = "ppParent";
         var _activePlayer = "ppl";
-        var _subtitle = "[Optional] SRT | WebVTT | SubPlayer: +ASS";
+        var _subtitle = "https://interactive-examples.mdn.mozilla.net/media/examples/friday.vtt";
 
         //functions
         function Loaded() {
-            new bootstrap.Tooltip($("#warn")[0])
-            $("#sub")[0].value = _subtitle;
-            toggleActive();
+            new bootstrap.Tooltip($("#warn")[0]);
+            $("#sub")[0].placeholder = "[Optional] vtt, lrc, smi, ssa, ass, sub, srt, sbv, json";
 
+            toggleActive();
             ChangePlayer(_activePlayer);
             subValidation();
         }
@@ -153,12 +155,14 @@
             let source = document.createElement("source");
             let track = document.createElement("track"); //Only Wbttv
             source.src = vidadr;
-            Object.assign(track, { src: _subtitle, kind: "subtitle", srclang: "en-US", label: "English" });
+            Object.assign(track, {
+                src: _subtitle, kind: "captions", srclang: "en-US",
+                label: "English", default: true
+            });
 
             nplayer.appendChild(source);
             nplayer.appendChild(track);
             // HTML5 needs to load
-            nplayer.textTracks[0].mode = 'showing';
             nplayer.load();
         }
         /*Plyr library */
@@ -245,7 +249,6 @@
             }
             toggleVisibility();
             toggleActive();
-            SubControl();
         }
 
         function toggleVisibility() {
@@ -267,50 +270,29 @@
         }
 
         function SubControl() {
-            if (_subtitle.search('blob:') == 0) {
-                URL.revokeObjectURL(_subtitle);
-            }
             _subtitle = $("#sub")[0].value;
-            const ext = _subtitle.substring(_subtitle.length - 4, _subtitle.length);
 
-            switch (ext) {
-                case ".srt":
-                    //Convert to SRT
-                    $.get(_subtitle).then((x) => {
-                        const wbttc = new WebVTTConverter(new Blob([x], { type: 'text/plain' }));
-                        wbttc.getURL()
-                            .then(function (url) {
-                                _subtitle = url;
-                                subValidation(true);
-                            })
-                            .catch(function (err) {
-                                console.error(err);
-                            })
-                    });
+            if (_subtitle.substring(_subtitle.length - 4) == ".vtt") { subValidation(true); return; }
+            if (_subtitle.search('blob:') == 0) URL.revokeObjectURL(_subtitle);
 
-                    //let vtt;
-                    //  $.get(_subtitle).then((x) => {
-                    //vtt = srt2webvtt(x);
-                    //let subblob = new Blob([vtt], { type: 'text/vtt' });
-                    //_subtitle = (URL || webkitURL).createObjectURL(subblob);
+            $.get(_subtitle).then((x) => {
+                if (typeof (subsrt.detect(x)) !== 'undefined') {
+                    var vtt = subsrt.convert(x, { format: "vtt", verbose: true });
 
-                    //subValidation(true);
-                    //   });
+                    let subblob = new Blob([vtt], { type: 'text/vtt' });
+                    //logblob(subblob);
 
-                    break;
-                case ".ass":
-                    if (_activePlayer == "sply") {
-                        subValidation(true);
-                    } else subValidation(false);
-                    break;
-                case ".vtt":
+                    _subtitle = (URL || webkitURL).createObjectURL(subblob);
 
                     subValidation(true);
-                    break;
-                default:
-                    subValidation(false);
-            }
+
+                }
+                else subValidation(false);
+            }).fail((x, e) => {
+                subValidation(false);
+            });
         }
+
         function subValidation(ok) {
             //Green light
             if (ok) {
@@ -322,6 +304,15 @@
                 $("#sub").removeClass("border-success");
                 $("#sub").addClass("border-danger");
             }
+        }
+
+        /* log blob  */
+        function logblob(blob) {
+            var myReader = new FileReader();
+            myReader.onload = function (event) {
+                console.log(JSON.stringify(myReader.result));
+            };
+            myReader.readAsText(subblob);
         }
     </script>
 
@@ -336,3 +327,24 @@
 </body>
 
 </html>
+
+<!-- depricated convert
+// //Convert to SRT
+// $.get(_subtitle).then((x) => {
+//     const wbttc = new WebVTTConverter(new Blob([x], { type: 'text/plain' }));
+//     wbttc.getURL()
+//         .then(function (url) {
+//             _subtitle = url;
+//         })
+//         .catch(function (err) {
+//             console.error(err);
+//         })
+// });
+
+//let vtt;
+//  $.get(_subtitle).then((x) => {
+//vtt = srt2webvtt(x);
+//let subblob = new Blob([vtt], { type: 'text/vtt' });
+//_subtitle = (URL || webkitURL).createObjectURL(subblob);
+
+//subValidation(true); -->
